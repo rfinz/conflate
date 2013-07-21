@@ -1,0 +1,7 @@
+# Testfile for conflate configuration manager.
+
+
+test1 = False # this is a comment 
+# Comment on its own line
+test2 = {'hat': 1, 'baz': ['bye', 'bye', 'bye'], 'flibber': 7} 
+test3 = 'string' 
