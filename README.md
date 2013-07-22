@@ -38,7 +38,7 @@ load from a file.
    
    from conflate import confmgr
    
-   c = confmgr('test.conf', config) # from above
+   c = confmgr('test.conf', CONF=config) # from above
 
    ```
    
