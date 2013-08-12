@@ -8,6 +8,9 @@ A late-to-the-party, lightweight, stupid simple configuration manager.
 
 `python setup.py install` should do it.
 
+or
+
+`pip install conflate`
 
  Use Cases
 -----------
