@@ -40,9 +40,18 @@ class confmgr(object):
         self._CONF = None
         self.CONF = CONF #Dictionary of configuration settings
 
-    def readconf(self):
+    def readconf(self,
+                 read_uservalues = False,
+                 protect_config = True):
 
         """ Reads configuration from file.
+
+        Keyword Arguments:
+        read_uservalues -- "True" allows the addition of new keys into the
+                           configuration dictionary in memory by reading
+                           from disk.
+        protect_config -- "False" will turn off functionality that restores
+                          configuration dictionary if disk-read goes awry
 
         Must have a config file on disk, or call to readconf will prompt user
         to touch the file.
@@ -57,9 +66,22 @@ class confmgr(object):
 
         """
 
+        bak = self.CONF.copy()
+
         try:
             f =  open(self.config_filename, 'r+')
             config_file = f.read()
+            f.close()
+
+            if read_uservalues:
+                for t in config_file.splitlines():
+                    if self.comment_op in t:
+                        t = t[:t.find(self.comment_op)]
+                    p = t.partition(self.assign_op)
+                    entry = p[0].strip()
+                    if entry not in self.CONF and not entry == '':
+                        self.CONF[entry] = None
+
             for k in self.CONF:
                 for t in config_file.splitlines():
                     if self.comment_op in t:
@@ -72,6 +94,8 @@ class confmgr(object):
                             print >> sys.stderr, \
                                 "CONFLATE: Malformed value for property \'" + \
                                 str(k) + "\'"
+                            if protect_config:
+                                self.CONF = bak
         except IOError as e:
             self.nofile()
 
@@ -123,8 +147,8 @@ class confmgr(object):
 
         except IOError as e:
             self.nofile()
-        
-
+    
+    
     def printconf(self):
         
         """ Prints configuration (self.CONF) in an advantageous manner.
@@ -175,6 +199,18 @@ class confmgr(object):
 
 
 if __name__=="__main__":
+    f = open("test.conf", 'w')
+    st = ('# Testfile for conflate configuration manager.\n'
+          '# Running conflate.py by itself from its home directory will\n'
+          '# modify this file.\n'
+          'test1 = False # this is a comment\n' 
+          '# Comment on its own line\n'
+          "test2 = {'hat': 2, 'baz': ['hi', 'hi', 'hi'], 'flibber': 8}\n" 
+          "test3 = 'string'\n"
+          'test4 = False')
+    f.write(st)
+    f.close()
+
     c = confmgr("test.conf", silent = True, CONF = ['test1','test2','test3'])
     c.readconf()
     c.printconf()
@@ -182,5 +218,6 @@ if __name__=="__main__":
               'test2' : {'baz':['bye', 'bye', 'bye'], 'hat': 1, 'flibber':7},
               'test3' : 'string'}
     c.writeconf()
-    c.readconf()
+    c.readconf(read_uservalues=True)
     c.printconf()
+

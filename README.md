@@ -91,3 +91,6 @@ changed later.
 An example configuration file can be found in the source. It is named 
 'test.conf'.
 
+If you want to stick to DRY and keep your config entirely on disk, you can
+generate your in-memory version of the configuration from the disk version by
+using the "read_uservalues" keyword argument of `readconf`.
